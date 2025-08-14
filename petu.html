@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sexy Form • Glassmorphism</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1: #0f1020; /* deep slate */
+      --bg2: #1a1b3a; /* indigo */
+      --accent: #7c5cff; /* violet */
+      --accent-2: #1dd1a1; /* teal */
+      --text: #e8e8f3;
+      --muted: #b6b6c9;
+      --ring: rgba(124,92,255,.45);
+      --card: rgba(255,255,255,.08);
+      --card-stroke: rgba(255,255,255,.18);
+      --shadow: 0 10px 30px rgba(2,7,62,.35), 0 2px 12px rgba(2,7,62,.25);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 20% 10%, #2a2b55 0%, transparent 40%),
+                  radial-gradient(1100px 700px at 80% 0%, #1b5f5a55 0%, transparent 45%),
+                  linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+      display:grid; place-items:center;
+      padding: 24px;
+    }
+    .wrap{
+      width: 100%;
+      max-width: 980px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 26px;
+    }
+    @media (max-width: 920px){ .wrap{ grid-template-columns: 1fr; } }
+
+    .card{
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--card-stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px) saturate(120%);
+      -webkit-backdrop-filter: blur(14px) saturate(120%);
+      overflow: hidden;
+    }
+    .card::before{
+      content: "";
+      position: absolute; inset: -2px;
+      background: conic-gradient(from 120deg at 50% 50%, transparent 0 35%, rgba(255,255,255,.06) 40% 60%, transparent 65% 100%);
+      filter: blur(10px); opacity: .6; pointer-events: none;
+    }
+    .card-header{ padding: 26px 26px 0; }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      background: rgba(124,92,255,.16);
+      border:1px solid rgba(124,92,255,.35);
+      font-size:12px; letter-spacing:.4px; text-transform:uppercase; color:#dcd7ff;
+    }
+    .title{ font-weight: 700; font-size: 28px; margin: 14px 0 4px; }
+    .subtitle{ color: var(--muted); margin: 0 0 6px; }
+
+    form{ padding: 20px 26px 26px; display:grid; gap:16px; }
+
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    @media (max-width: 600px){ .row{ grid-template-columns: 1fr; } }
+
+    .field{ position: relative; }
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%; border-radius:14px; border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 18px 48px 14px 48px; /* leave space for icon + label */
+      outline: none; appearance: none;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .1s ease;
+    }
+    .field textarea{ min-height: 110px; resize: vertical; }
+    .field input::placeholder,
+    .field textarea::placeholder{ color: transparent; }
+
+    .field label{
+      pointer-events:none; position:absolute; left:48px; top:16px;
+      color: var(--muted); transition: all .18s ease; font-size: 14px;
+      background: transparent; padding: 0 6px;
+    }
+    /* floating state */
+    .field input:focus + label,
+    .field textarea:focus + label,
+    .field select:focus + label,
+    .field input:not(:placeholder-shown) + label,
+    .field textarea:not(:placeholder-shown) + label{
+      top:6px; font-size:11px; opacity:.9;
+    }
+
+    .icon{ position:absolute; left:14px; top:50%; transform: translateY(-50%); width:22px; height:22px; opacity:.75; }
+
+    .field:focus-within input,
+    .field:focus-within textarea,
+    .field:focus-within select{
+      border-color: var(--accent); box-shadow: 0 0 0 6px var(--ring);
+      background: rgba(255,255,255,.10);
+    }
+
+    /* validation states */
+    .field input:invalid[required]{ border-color: #ff7b7b99; }
+    .hint{ font-size:12px; color: var(--muted); margin-top: -8px; }
+
+    .actions{ display:grid; gap:10px; margin-top: 6px; }
+    .btn{
+      cursor:pointer; border:none; border-radius: 14px; padding: 14px 18px; font-weight: 600;
+      background: linear-gradient(135deg, var(--accent) 0%, #5e44ff 40%, #a78bfa 100%);
+      color:white; position:relative; overflow:hidden;
+      transition: transform .06s ease; will-change: transform;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn::after{
+      content:""; position:absolute; inset:0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+      transform: translateX(-120%);
+    }
+    .btn:hover::after{ animation: sheen 1.2s ease; }
+    @keyframes sheen{ to{ transform: translateX(120%); } }
+
+    .muted-link{ text-align:center; font-size: 13px; color: var(--muted); }
+    .muted-link a{ color: #dcd7ff; text-decoration: none; border-bottom:1px dashed rgba(124,92,255,.5); }
+
+    /* Side card */
+    .side{
+      padding: 26px; display:flex; flex-direction:column; gap:16px; justify-content:center;
+    }
+    .side h3{ margin:0; font-size:22px; }
+    .gradient-text{
+      background: linear-gradient(90deg, #dcd7ff, #8ef7dc); -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .list{ margin:0; padding-left: 18px; color: var(--muted); }
+
+    /* Toggle */
+    .toggle{ position:absolute; right:12px; top:50%; transform: translateY(-50%); border:none; background:transparent; color: var(--muted); cursor:pointer; }
+
+    /* Select arrow */
+    .field select{ padding-right: 44px; }
+    .field .arrow{ position:absolute; right:14px; top:50%; transform: translateY(-50%); pointer-events:none; opacity:.7; }
+
+    /* Accessibility helpers */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+    @media (prefers-color-scheme: light){
+      :root{ --text:#0a0a12; --muted:#5e6279; --card: rgba(255,255,255,.7); --card-stroke: rgba(0,0,0,.06); --ring: rgba(124,92,255,.25); }
+      body{ background: radial-gradient(1200px 600px at 20% 10%, #efecff 0%, transparent 40%), radial-gradient(1100px 700px at 80% 0%, #dff8f3 0%, transparent 45%), linear-gradient(160deg, #f5f7ff 0%, #ecf1ff 100%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Main Form Card -->
+    <section class="card" aria-labelledby="formTitle">
+      <div class="card-header">
+        <span class="badge">✨ Premium</span>
+        <h1 id="formTitle" class="title">Sign up to get early access</h1>
+        <p class="subtitle">Smooth floating labels, glassy surfaces, and accessible markup.</p>
+      </div>
+
+      <form action="#" method="post" novalidate>
+        <div class="row">
+          <div class="field">
+            <input id="firstName" name="firstName" placeholder=" " required autocomplete="given-name" />
+            <label for="firstName">First name</label>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <div class="field">
+            <input id="lastName" name="lastName" placeholder=" " required autocomplete="family-name" />
+            <label for="lastName">Last name</label>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+
+        <div class="field">
+          <input id="email" type="email" name="email" placeholder=" " required autocomplete="email" />
+          <label for="email">Email address</label>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6.75A1.75 1.75 0 0 1 4.75 5h14.5A1.75 1.75 0 0 1 21 6.75v10.5A1.75 1.75 0 0 1 19.25 19H4.75A1.75 1.75 0 0 1 3 17.25V6.75Z" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5"/></svg>
+          <p id="emailHint" class="hint">We'll never share your email. Pinky promise.</p>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <input id="password" type="password" name="password" placeholder=" " minlength="6" required autocomplete="new-password" />
+            <label for="password">Create password</label>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 11H7a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5"/></svg>
+            <button class="toggle" type="button" aria-label="Toggle password visibility" title="Show password" onclick="togglePassword()">👁️</button>
+          </div>
+          <div class="field">
+            <select id="role" name="role" required>
+              <option value="" disabled selected hidden></option>
+              <option>Designer</option>
+              <option>Developer</option>
+              <option>Product Manager</option>
+              <option>Student</option>
+              <option>Other</option>
+            </select>
+            <label for="role">Your role</label>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="7" r="3.25" stroke="currentColor" stroke-width="1.5"/><path d="M4 19.5a8 8 0 1 1 16 0" stroke="currentColor" stroke-width="1.5"/></svg>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+
+        <div class="field">
+          <textarea id="about" name="about" placeholder=" " aria-describedby="aboutHelp"></textarea>
+          <label for="about">Tell us a bit about your goals (optional)</label>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 2.268 1.113 4.299 2.915 5.67.198.151.376.397.37.657-.018.79-.263 2.098-1.16 3.016 1.716-.218 3.24-.78 4.35-1.425.24-.138.541-.097.813-.05A9.56 9.56 0 0 0 12 20Z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <p id="aboutHelp" class="hint">Max 500 characters recommended.</p>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="tos" required />
+          <label for="tos" style="font-size:14px; color:var(--muted)">I agree to the <a href="#" style="color:#dcd7ff">Terms</a> & <a href="#" style="color:#dcd7ff">Privacy</a>.</label>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="submit">Create my account</button>
+          <p class="muted-link">Already have an account? <a href="#">Sign in</a></p>
+        </div>
+      </form>
+    </section>
+
+    <!-- Side panel -->
+    <aside class="card side" aria-label="Highlights">
+      <h3 class="gradient-text">Why this form feels ✨ sexy</h3>
+      <ul class="list">
+        <li>Floating labels with smooth transitions</li>
+        <li>Glassy surface with soft, realistic shadows</li>
+        <li>Accessible: labels, focus rings, and semantic HTML</li>
+        <li>Responsive two-column layout that collapses elegantly</li>
+        <li>Tiny JS: password visibility toggle only</li>
+      </ul>
+      <div style="height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);"></div>
+      <p class="subtitle">Pro tip: Press <strong>Tab</strong> to explore the focus styles.</p>
+    </aside>
+  </div>
+
+  <script>
+    function togglePassword(){
+      const input = document.getElementById('password');
+      const btn = event.currentTarget;
+      if (input.type === 'password'){
+        input.type = 'text';
+        btn.title = 'Hide password';
+      } else {
+        input.type = 'password';
+        btn.title = 'Show password';
+      }
+    }
+  </script>
+</body>
+</html>
